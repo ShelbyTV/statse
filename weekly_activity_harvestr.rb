@@ -32,7 +32,7 @@ reduce = <<-JS
 #  and run M/R on each collection
 #  output goes to one collection, weekly:date
 ####################################################
-today = Date.today
+today = Date.today - 1
 weekly_collection_name = "Weekly:" + today.year.to_s + today.month.to_s + today.day.to_s
 7.times do |i|
   d = today - i
@@ -48,4 +48,7 @@ end
 coll = db.collection(weekly_collection_name)
 statsd = Statsd.new(STATSD_SERVER, STATSD_PORT)
 statsd.count('activity.weekly.total', coll.count)
-statsd.count('activity.weekly.one_visit', coll.find("value.days_with_activity"=>{"$gt"=>2}).count)
+7.times do |i|
+  i+=1
+  statsd.count('activity.weekly.visits.#{i}', coll.find("value.days_with_activity" => i).count)  
+end
