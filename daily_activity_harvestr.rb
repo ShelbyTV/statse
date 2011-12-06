@@ -1,14 +1,15 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 
-# This script harvests data from a mongo db and sends it to a statsd server
+# Run Frequency: Every 10min
+# This script harvests data from mongodb and sends it to a statsd server
 
-require_relative 'config.rb'
+require_relative 'config'
 
 #####################
 # get count of todays DAU
 #####################
-db = Mongo::Connection.new(mongo_host, mongo_port).db(db_name)
+db = Mongo::Connection.new(MONGO_HOST, MONGO_PORT).db(DB_NAME)
 
 today = Date.today
 collection_name = "Daily:" + today.year.to_s + today.month.to_s + today.day.to_s
@@ -18,5 +19,5 @@ dau = coll.count()
 #####################
 # send stat to statsd 
 #####################
-statsd = Statsd.new(statsd_server, statsd_port)
+statsd = Statsd.new(STATSD_SERVER, STATSD_PORT)
 statsd.count('activity.daily', dau)
