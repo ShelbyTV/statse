@@ -3,16 +3,7 @@
 
 # This script harvests data from a mongo db and sends it to a statsd server
 
-require 'date'
-require 'mongo'
-require 'statsd'
-
-# Config
-statsd_server = 'localhost'
-statsd_port = 8125
-mongo_host = 'localhost'
-mongo_port = 27017
-db_name = "DailyActivity"
+require_relative 'config.rb'
 
 #####################
 # get count of todays DAU
