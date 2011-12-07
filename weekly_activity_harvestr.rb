@@ -58,7 +58,7 @@ end
 ####################################################
 day_1 = Date.today - 1
 day_2 = Date.today - 8
-collecttion_name_a = "Weekly:" + day_1.year.to_s + day_1.month.to_s + day_1.day.to_s
+collection_name_a = "Weekly:" + day_1.year.to_s + day_1.month.to_s + day_1.day.to_s
 collection_name_b = "Weekly:" + day_2.year.to_s + day_2.month.to_s + day_2.day.to_s
 collection_a = db.collection(collection_name_a)
 collection_b = db.collection(collection_name_b)
@@ -74,5 +74,5 @@ temp_collection.drop() # this was only temporary, say goodbye
 
 # now compute actual retention over period and send to statsd
 # NOTE: multiplying retention by 100 so that we can pass this decimal as an integer.  *** divide by 100 when using this ***
-retention = (raw_retention.to_f / temp_collection_size.to_f) * 100
+retention = (raw_retention.to_f / temp_collection_size) * 100
 statsd.count('activity.retention.weekly', retention.to_i)
