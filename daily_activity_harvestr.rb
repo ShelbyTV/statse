@@ -12,7 +12,7 @@ require_relative 'config'
 db = Mongo::Connection.new(MONGO_HOST, MONGO_PORT).db(DB_NAME)
 
 today = Date.today
-collection_name = "Daily:" + today.year.to_s + today.month.to_s + today.day.to_s
+collection_name = "Daily:" + today.strftime("%Y%m%d")
 coll = db.collection(collection_name)
 dau = coll.count()
 

@@ -33,10 +33,10 @@ reduce = <<-JS
 #  output goes to one collection, weekly:date
 ####################################################
 today = Date.today - 1
-weekly_collection_name = "Weekly:" + today.year.to_s + today.month.to_s + today.day.to_s
+weekly_collection_name = "Weekly:" + today.strftime("%Y%m%d")
 7.times do |i|
   d = today - i
-  collection_name = "Daily:" + d.year.to_s + d.month.to_s + d.day.to_s
+  collection_name = "Daily:" + d.strftime("%Y%m%d")
   coll = db.collection(collection_name)
   # dont run map_reduce on collections that dont exist
   coll.map_reduce(map, reduce, { :out => {:reduce => weekly_collection_name} }) if coll.count > 0
@@ -58,8 +58,8 @@ end
 ####################################################
 day_1 = Date.today - 1
 day_2 = Date.today - 8
-collection_name_a = "Weekly:" + day_1.year.to_s + day_1.month.to_s + day_1.day.to_s
-collection_name_b = "Weekly:" + day_2.year.to_s + day_2.month.to_s + day_2.day.to_s
+collection_name_a = "Weekly:" + day_1.strftime("%Y%m%d")
+collection_name_b = "Weekly:" + day_2.strftime("%Y%m%d")
 collection_a = db.collection(collection_name_a)
 collection_b = db.collection(collection_name_b)
 
