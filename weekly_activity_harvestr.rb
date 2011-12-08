@@ -63,16 +63,20 @@ collection_name_b = "Weekly:" + day_2.strftime("%Y%m%d")
 collection_a = db.collection(collection_name_a)
 collection_b = db.collection(collection_name_b)
 
-# run map_reduce over both weeks collections and only keep those with value.count > 1 to get the logical AND
-collection_a.map_reduce(map, reduce, { :out => {:reduce => "retention:temp"} }) if collection_a.count > 0
-collection_b.map_reduce(map, reduce, { :out => {:reduce => "retention:temp"} }) if collection_b.count > 0
+if collection_a.count > 0 and collection_b.count > 0 
+  # run map_reduce over both weeks collections and only keep those with value.count > 1 to get the logical AND
+  collection_a.map_reduce(map, reduce, { :out => {:reduce => "retention:temp"} })
+  collection_b.map_reduce(map, reduce, { :out => {:reduce => "retention:temp"} })
 
-temp_collection = db.collection("retention:temp")
-temp_collection_size = temp_collection.count
-raw_retention = temp_collection.find( "value.days_with_activity" => {"$gt" => 1} ).count
-temp_collection.drop() # this was only temporary, say goodbye
+  temp_collection = db.collection("retention:temp")
+  temp_collection_size = temp_collection.count
+  raw_retention = temp_collection.find( "value.days_with_activity" => {"$gt" => 1} ).count
+  temp_collection.drop() # this was only temporary, say goodbye
 
-# now compute actual retention over period and send to statsd
-# NOTE: multiplying retention by 100 so that we can pass this decimal as an integer.  *** divide by 100 when using this ***
-retention = (raw_retention.to_f / temp_collection_size) * 100
-statsd.count('activity.retention.weekly', retention.to_i)
+  # now compute actual retention over period and send to statsd
+  # NOTE: multiplying retention by 100 so that we can pass this decimal as an integer.  *** divide by 100 when using this ***
+  retention = (raw_retention.to_f / temp_collection_size) * 100
+  statsd.count('activity.retention.weekly', retention.to_i)
+else
+  statsd.count('activity.retention.weekly', 0)
+end
