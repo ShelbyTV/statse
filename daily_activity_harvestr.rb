@@ -20,4 +20,4 @@ dau = coll.count()
 # send stat to statsd 
 #####################
 statsd = Statsd.new(STATSD_SERVER, STATSD_PORT)
-statsd.count('activity.daily', dau)
+statsd.count('activity.daily.incremental_count', dau)

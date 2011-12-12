@@ -32,10 +32,10 @@ reduce = <<-JS
 #  and run M/R on each collection
 #  output goes to one collection, weekly:date
 ####################################################
-today = Date.today - 1
-weekly_collection_name = "Weekly:" + today.strftime("%Y%m%d")
+yesterday = Date.today - 1
+weekly_collection_name = "Weekly:" + yesterday.strftime("%Y%m%d")
 7.times do |i|
-  d = today - i
+  d = yesterday - i
   collection_name = "Daily:" + d.strftime("%Y%m%d")
   coll = db.collection(collection_name)
   # dont run map_reduce on collections that dont exist
@@ -80,3 +80,13 @@ if collection_a.count > 0 and collection_b.count > 0
 else
   statsd.count('activity.retention.weekly', 0)
 end
+
+
+####################################################
+# send DAU to StatsD once per day
+####################################################
+collection_name = "Daily:" + day_1.strftime("%Y%m%d")
+coll = db.collection(collection_name)
+dau = coll.count()
+
+statsd.count('activity.daily.final_count', dau)
