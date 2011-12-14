@@ -50,7 +50,8 @@ statsd = Statsd.new(STATSD_SERVER, STATSD_PORT)
 statsd.count('activity.weekly.total', weekly_coll.count)
 7.times do |i|
   i+=1
-  statsd.count('activity.weekly.visits.#{i}', weekly_coll.find("value.days_with_activity" => i).count)  
+  stat = "activity.weekly.visits." + i.to_s
+  statsd.count(stat, weekly_coll.find("value.days_with_activity" => i).count)  
 end
 
 ####################################################
