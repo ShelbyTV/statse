@@ -15,6 +15,7 @@ db = Mongo::Connection.new(MONGO_HOST, MONGO_PORT).db(DB_NAME)
 # ** note: NOT including ios sharing actions because 
 #       they are also reported by the rails backend 
 ####################################################
+THRESHOLD_RANGE = 20 # allows us to pick what the threshold is after the fact.
 
 actions = {
   "twitter_signin" => 1,
@@ -55,7 +56,7 @@ deu_coll = db.collection("DailyEngagement:" + yesterday.strftime("%Y%m%d"))
 
 total_engagement = 0
 engaged_users = 0
-20.times do |i|
+THRESHOLD_RANGE.times do |i|
   var_name = "@engaged_users_" + (i + 4).to_s
   instance_variable_set(var_name, 0)
 end
@@ -76,12 +77,12 @@ dau_coll.find.each do |user|
   end
   doc["activity"].values.each {|x| sum += x if x.class == Fixnum} if doc["activity"]
   doc["engagement"] = sum
-  20.times do |i|
+  THRESHOLD_RANGE.times do |i|
     var_name = "@engaged_users_" + (i + 4).to_s
     instance_variable_set(var_name, instance_variable_get(var_name)+1) if sum >= i + 4
   end
   total_engagement += sum
-  #deu_coll.insert(doc)
+  deu_coll.insert(doc)
 end
 
 ####################################################
@@ -90,4 +91,8 @@ end
 statsd = Statsd.new(STATSD_SERVER, STATSD_PORT)
 engagement_mean = total_engagement.to_f / dau_coll.count.to_f
 statsd.count('engagement.daily.mean', engagement_mean)
-statsd.count('engagement.daily.user_count', engaged_users)
+THRESHOLD_RANGE.times do |i|
+  var_name = "@engaged_users_" + (i + 4).to_s
+  statsd.count('engagement.daily.threshold.' + (i+4).to_s, instance_variable_get(var_name) )  
+end
+
