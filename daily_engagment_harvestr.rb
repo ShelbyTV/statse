@@ -16,8 +16,6 @@ db = Mongo::Connection.new(MONGO_HOST, MONGO_PORT).db(DB_NAME)
 #       they are also reported by the rails backend 
 ####################################################
 
-ENGAGED_THRESHOLD = 8
-
 actions = {
   "twitter_signin" => 1,
   "facebook_signin" => 1,
@@ -57,6 +55,11 @@ deu_coll = db.collection("DailyEngagement:" + yesterday.strftime("%Y%m%d"))
 
 total_engagement = 0
 engaged_users = 0
+20.times do |i|
+  var_name = "@engaged_users_" + (i + 4).to_s
+  instance_variable_set(var_name, 0)
+end
+
 
 dau_coll.find.each do |user|
   doc = {}
@@ -73,9 +76,12 @@ dau_coll.find.each do |user|
   end
   doc["activity"].values.each {|x| sum += x if x.class == Fixnum} if doc["activity"]
   doc["engagement"] = sum
-  engaged_users += 1 if sum >= ENGAGED_THRESHOLD
+  20.times do |i|
+    var_name = "@engaged_users_" + (i + 4).to_s
+    instance_variable_set(var_name, instance_variable_get(var_name)+1) if sum >= i + 4
+  end
   total_engagement += sum
-  deu_coll.insert(doc)
+  #deu_coll.insert(doc)
 end
 
 ####################################################
