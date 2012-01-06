@@ -79,7 +79,7 @@ dau_coll.find.each do |user|
   doc["engagement"] = sum
   THRESHOLD_RANGE.times do |i|
     var_name = "@engaged_users_" + (i + 4).to_s
-    instance_variable_set(var_name, instance_variable_get(var_name)+1) if sum >= i + 4
+    instance_variable_set(var_name, instance_variable_get(var_name)+1) if sum > i + 4
   end
   total_engagement += sum
   deu_coll.insert(doc)
