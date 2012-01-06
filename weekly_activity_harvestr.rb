@@ -76,8 +76,8 @@ if collection_a.count > 0 and collection_b.count > 0
 
   # now compute actual retention over period and send to statsd
   # NOTE: multiplying retention by 100 so that we can pass this decimal as an integer.  *** divide by 100 when using this ***
-  retention = (raw_retention.to_f / temp_collection_size) * 100
-  statsd.count('activity.retention.weekly', retention.to_i)
+  retention = (raw_retention.to_f / temp_collection_size.to_f) * 100
+  statsd.count('activity.retention.weekly', retention.to_f)
 else
   statsd.count('activity.retention.weekly', 0)
 end
