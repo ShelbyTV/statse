@@ -53,6 +53,7 @@ dau_coll = db.collection("Daily:" + yesterday.strftime("%Y%m%d"))
 deu_coll = db.collection("DailyEngagement:" + yesterday.strftime("%Y%m%d"))
 
 total_engagement = 0
+engaged_users = 0
 
 dau_coll.find.each do |user|
   doc = {}
@@ -69,6 +70,7 @@ dau_coll.find.each do |user|
   end
   doc["activity"].values.each {|x| sum += x if x.class == Fixnum} if doc["activity"]
   doc["engagement"] = sum
+  engaged_users += 1 if sum >= 7
   total_engagement += sum
   deu_coll.insert(doc)
 end
@@ -79,3 +81,4 @@ end
 statsd = Statsd.new(STATSD_SERVER, STATSD_PORT)
 engagement_mean = total_engagement.to_f / dau_coll.count.to_f
 statsd.count('engagement.daily.mean', engagement_mean)
+statsd.count('engagement.daily.user_count', engaged_users)
