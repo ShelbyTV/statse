@@ -71,11 +71,11 @@ dau_coll.find.each do |user|
       when "_id"
         doc[key] = user[key]
       when action
-        doc["activity"] = { key => actions[action] * user[key]}
+        doc[key] = actions[action] * user[key]
       end
     end
   end
-  doc["activity"].values.each {|x| sum += x if x.class == Fixnum} if doc["activity"]
+  doc.values.each {|x| sum += x if x.class == Fixnum} if doc
   doc["engagement"] = sum
   THRESHOLD_RANGE.times do |i|
     var_name = "@engaged_users_" + (i + 4).to_s
